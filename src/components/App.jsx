@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 import ImageGallery from './ImageGallery/ImageGallery';
 import Searchbar from './Searchbar/Searchbar';
 import Button from './Button/Button';
@@ -12,73 +12,54 @@ const appStyles = {
   paddingBottom: '24px'
 };
 
-export class App extends Component {
-  state = {
-    cards: [],
-    searchString: '',
-    page: 1,
-    isLoading: false,
-    error: null,
-    totalImages: 0
-  };
+export const App = () => {
 
-  componentDidUpdate = async (_, prevState) => {
-    const { searchString, page } = this.state
-    if (page !== prevState.page || searchString !== prevState.searchString) {
-      this.setState(() => ({
-        isLoading: true
-      }))
+  const [cards, setCards] = useState([]);
+  const [searchString, setSearchString] = useState('');
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [totalImages, setTotalImages] = useState(0);
 
-      try {
-        const { hits, totalHits } = await getCards(searchString, page);
-        this.setState((prev) => ({
-          cards: [...prev.cards, ...hits],
-          error: null,
-          totalImages: totalHits
-        }))
-      } catch (error) {
-        this.setState(() => ({
-          error: error.message
-        }))
-      } finally {
-        this.setState(() => ({
-          isLoading: false
-        }))
-      }
+  useEffect(() => {
+    searchString && setIsLoading(true)
+    page && setIsLoading(true)
 
+    getCardFunc()
 
+  }, [page, searchString])
+
+  const getCardFunc = async () => {
+    try {
+      setIsLoading(true)
+      const { hits, totalHits } = await getCards(searchString, page);
+      setCards([...cards, ...hits])
+      setError(null)
+      setTotalImages(totalHits)
+    } catch (error) {
+      setError(error.message)
+    } finally {
+      setIsLoading(false)
     }
   }
 
-
-  handleSearchForm = (searchString) => {
-    this.setState(() => ({
-      cards: [],
-      page: 1,
-      searchString
-    }))
+  const handleSearchForm = (searchString) => {
+    setCards([]);
+    setPage(1);
+    setSearchString(searchString);
   }
 
-
-  loadMoreClick = () => {
-    this.setState((prev) => ({
-      page: prev.page + 1,
-    }))
+  const loadMoreClick = () => {
+    setPage(page + 1);
   }
 
-
-  render() {
-
-    const { cards, isLoading, searchString, totalImages, error} = this.state;
-
-    return (
-      <div style={appStyles}>
-        <Searchbar onSubmit={this.handleSearchForm} />
-        {isLoading && <Loader />}
-        {error && <p>{error}</p>}
-        {searchString && <ImageGallery cards={cards} />}
-        {searchString && totalImages > cards.length && <Button onClick={this.loadMoreClick} />}
-      </div>
-    );
-  }
+  return (
+    <div style={appStyles}>
+      <Searchbar onSubmit={(value) => { handleSearchForm(value) }} />
+      {isLoading && <Loader />}
+      {error && <p>{error}</p>}
+      {searchString && <ImageGallery cards={cards} />}
+      {searchString && totalImages > cards.length && <Button onClick={loadMoreClick} />}
+    </div>
+  );
 }

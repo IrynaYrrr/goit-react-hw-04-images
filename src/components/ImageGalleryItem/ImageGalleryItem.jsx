@@ -1,47 +1,35 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import css from './ImageGalleryItem.module.css';
-import Modal from 'components/Modal/Modal';
+import { Modal } from 'components/Modal/Modal';
 
-export default class ImageGalleryItem extends Component {
+export const ImageGalleryItem = ({ webformatURL, largeImageURL, id }) => {
 
-  state = {
-    isShowModal: false
-  };
+  const [isShowModal, setIsShowModal] = useState(false)
 
-  handleModalOpen = () => {
-    this.setState(() => ({
-      isShowModal: true
-    }))
+  const handleModalOpen = () => {
+    setIsShowModal(true)
   }
 
-
-  handleModalClose = () => {
-    this.setState(() => ({
-      isShowModal: false
-    }))
+  const handleModalClose = () => {
+    setIsShowModal(false)
   }
 
-  render() {
-    const { isShowModal } = this.state;
-    const { webformatURL, largeImageURL, id } = this.props;
-
-    return (
-      <li
-        className={css.imageGalleryItem}
-        key={id}
-        onClick={this.handleModalOpen}
-      >
-        <img
-          className={css.imageGalleryItemImage}
-          src={webformatURL}
-          alt="webCard"
-        />
-        {isShowModal && (
-          <Modal
-            largeImageURL={largeImageURL}
-            onClick={this.handleModalClose}
-          />)}
-      </li>
-    )
-  }
+  return (
+    <li
+      className={css.imageGalleryItem}
+      key={id}
+      onClick={handleModalOpen}
+    >
+      <img
+        className={css.imageGalleryItemImage}
+        src={webformatURL}
+        alt="webCard"
+      />
+      {isShowModal && (
+        <Modal
+          largeImageURL={largeImageURL}
+          onClick={handleModalClose}
+        />)}
+    </li>
+  )
 }
