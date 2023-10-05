@@ -22,27 +22,28 @@ export const App = () => {
   const [totalImages, setTotalImages] = useState(0);
 
   useEffect(() => {
-    searchString && setIsLoading(true)
-    page && setIsLoading(true)
+    if (!searchString) return;
+
+    const getCardFunc = async () => {
+      try {
+        setIsLoading(true)
+        const { hits, totalHits } = await getCards(searchString, page);
+        // setCards([...cards, ...hits])
+        setCards((prev)=>[...prev, ...hits])
+        setError(null)
+        setTotalImages(totalHits)
+      } catch (error) {
+        setError(error.message)
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
     getCardFunc()
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, searchString])
 
-  const getCardFunc = async () => {
-    try {
-      setIsLoading(true)
-      const { hits, totalHits } = await getCards(searchString, page);
-      setCards([...cards, ...hits])
-      setError(null)
-      setTotalImages(totalHits)
-    } catch (error) {
-      setError(error.message)
-    } finally {
-      setIsLoading(false)
-    }
-  }
+
 
   const handleSearchForm = (searchString) => {
     setCards([]);
@@ -51,7 +52,7 @@ export const App = () => {
   }
 
   const loadMoreClick = () => {
-    setPage(page + 1);
+    setPage((prev) => prev + 1);
   }
 
   return (

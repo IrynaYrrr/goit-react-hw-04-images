@@ -18,12 +18,11 @@ export const ImageGalleryItem = ({ webformatURL, largeImageURL, id }) => {
     <li
       className={css.imageGalleryItem}
       key={id}
-      onClick={handleModalOpen}
     >
       <img
         className={css.imageGalleryItemImage}
         src={webformatURL}
-        alt="webCard"
+        alt="webCard" onClick={handleModalOpen}
       />
       {isShowModal && (
         <Modal

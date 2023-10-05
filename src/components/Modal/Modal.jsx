@@ -3,30 +3,28 @@ import css from './Modal.module.css';
 
 export const Modal = ({ onClick, largeImageURL }) => {
 
-  const keyDownEvent = (e) => {
-    if (e.code === 'Escape') {
-      onClick();
-    };
-  };
-
   const onClickEvent = (e) => {
-    if (e.srcElement.localName !== 'img') {
+    if (e.target?.localName !== 'img') {
       onClick();
     }
   }
 
   useEffect(() => {
+    const keyDownEvent = (e) => {
+      if (e.code === 'Escape') {
+        onClick();
+      };
+    };
+
     document.addEventListener('keydown', keyDownEvent);
-    document.addEventListener('click', onClickEvent);
 
     return () => {
       document.removeEventListener('keydown', keyDownEvent);
-      document.removeEventListener('click', onClickEvent);
     }
-  })
+  }, [onClick])
 
   return (
-    <div className={css.overlay}>
+    <div className={css.overlay} onClick={onClickEvent}>
       <div className={css.modal}>
         <img src={largeImageURL} alt="largeCard" className={css.overlayImg} />
       </div>
